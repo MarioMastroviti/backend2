@@ -1,12 +1,22 @@
 [
   {
-    "id": 1,
-    "titulo": "producto 1 ",
+    "id": 2,
+    "titulo": "producto 1",
     "precio": 200
   },
   {
-    "id": 2,
-    "titulo": "producto 2 ",
+    "id": 3,
+    "titulo": "producto 2",
     "precio": 200
+  },
+  {
+    "id": 4,
+    "titulo": "producto 4",
+    "precio": 30000
+  },
+  {
+    "id": 1,
+    "titulo": "producto 1",
+    "precio": 30000
   }
 ]

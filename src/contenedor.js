@@ -23,18 +23,16 @@ const fs = require('fs');
         }
     }
 
-async productById(id){
-    try{
-        const objetos = await this.getAllProducts()
-        const objeto = objetos.find((o) => o.id === id)
-        return objeto || null
-    }
-    catch(error){
-        throw new Error("error al obtener el id")
-
+    async productById(id){
+        try{
+            const objetos = await this.getAllProducts()
+            const objeto = objetos.find((o) => o.id === id)
+             return objeto || null
+        }
+        catch(error){
+            throw new Error("error al obtener el id")
         }
     }
-    
 
 
 async getAll(){
@@ -85,5 +83,5 @@ async saveProduct(objetos){
 }
 }
 
-
-module.exports = Contenedor;
+const productos = new Contenedor("products.json")
+module.exports = productos;

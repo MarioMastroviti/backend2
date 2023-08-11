@@ -3,8 +3,6 @@ const express = require('express');
 const router = express.Router();
 
 const cartManager = require("../cartManager");
-const contenedor = require("../contenedor");
-
 
 
 router.post('/api/cart', async (req,res) => {
@@ -38,38 +36,21 @@ router.get("/api/cart", async (req, res) => {
         })
    
     
-    /*router.post('/api/cart/:cid/product/:pid', async (req,res) => {
-        const {cid, pid} = req.params
-        try {
-            const newProductAdded = await cartManager.addProductToCart(+cid, +pid)
-            res.status(200).json({message: 'Product added to cart', product: newProductAdded}) 
-        } catch (error) {
-            res.status(500).json({error})
-        }
-    } )*/
-
+ 
+    
     router.post('/api/cart/:cid/product/:pid', async (req, res) => {
         try {
-            const carritoId = parseInt(req.params.cid);
-            const productoId = parseInt(req.params.pid);
-
-               
-            const carritoEncontrado = await cartManager.getCartsById(carritoId);
-            if (!carritoEncontrado) {
-                return res.status(404).json({ error: 'Carrito no encontrado.' });
-            }
-
-        
+            const {cid, pid} = req.params
     
-            
-            carritoEncontrado.add = carritoEncontrado.productos || [];
-            carritoEncontrado.productos.push(productoId);
+            if(cartManager){
+            const newProduct = await cartManager.addProductToCart(+cid, +pid);
     
-            await cartManager.addCart(carritoEncontrado);
-    
-            res.json({ mensaje: `Producto ${productoId} agregado al carrito ${carritoId}.` });
+            res.status(200).json({ message: 'Producto agregado al carrito con éxito'});
+        }else{
+            res.status(400).json({ message: 'carrito no encontrado' });
+        }
         } catch (error) {
-            res.status(500).json({ error: 'Error al agregar el producto al carrito.' });
+              res.status(500).json({ message: 'Error al agregar el producto al carrito' });
         }
     });
     

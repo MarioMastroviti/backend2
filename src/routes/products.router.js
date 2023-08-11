@@ -1,16 +1,15 @@
 const express = require('express');
 
 const router = express.Router();
+const productos = require('../contenedor');
 
-
-const contenedor = require('../contenedor');
-const productos = new contenedor("products.json")
 
 router.get("/api/products" , async(req, res) => {
     const todosProductos = await productos.getAllProducts()
     res.json({status: "sucess", todosProductos})
-   })
-
+   });
+   
+   
    router.get("/api/products/:pid", async(req,res) => {
     const pid = parseInt(req.params.pid);
     const productoBuscado = await productos.productById(pid)
@@ -35,25 +34,28 @@ router.post("/api/products" , async (req, res) => {
     
 
 
- 
-    router.put('/api/products/:pid', async (req, res) => {
+router.put('/api/products/:pid', async (req, res) => {
+    try {
         const pid = parseInt(req.params.pid);
         const cambiarObjeto = req.body;
-    
-        if (productos[pid]) { 
-            productos[pid] = cambiarObjeto; 
-            await save(productos); 
 
-    res.status(200).json({ mensaje: "producto cambiado correctamente" }); 
+        const prodToChange = await productos.productById(pid);
+
+        if (prodToChange) {
+            const updatedProduct = { ...prodToChange, ...cambiarObjeto };
+            await productos.deleteProduct(pid);
+            await productos.save(updatedProduct);
+
+            res.status(200).json({ message: 'Producto actualizado con éxito', product: updatedProduct });
         } else {
-            res.status(400).json({ mensaje: "producto no encontrado" });
+            res.status(404).json({ message: 'Producto no encontrado' });
         }
-    });
-   
-    
-    
-    
-    
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error al actualizar el producto' });
+    }
+});
+
 
 router.delete('/api/products/:pid', async(req, res) => {
     try {
@@ -66,7 +68,6 @@ router.delete('/api/products/:pid', async(req, res) => {
          res.status(500).json({ error: 'Error al eliminar el producto' });
     }
 });
-
 
   
     

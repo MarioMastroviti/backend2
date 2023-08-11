@@ -1,6 +1,6 @@
 const fs = require('fs');
 const Contenedor = require("./contenedor");
-const contenedor = new Contenedor()
+
 
 
 class CartManager {
@@ -23,17 +23,16 @@ class CartManager {
         }
      }
 
- 
      async getCartsById(id) {
         try {
-            const cartsPrev = await this.getCarts()
-            const cartById = cartsPrev.find((o) => o.id === id)
-            return cartById || null
-        } catch(error) {
-            console.log(error)
-            return error
+            const cartsPrev = await this.getCarts();
+            const cartById = cartsPrev.find(o => o.id === id);
+            return cartById ? [cartById] : []; 
+        } catch (error) {
+            console.log(error);
+            return [];
         }
-     }
+    }
 
      async addCart() {
         try {
@@ -56,34 +55,43 @@ class CartManager {
             return error
         }
      }
-    
      async addProductToCart(cid, pid) {
         try {
-            const cartsPrev = await this.getCartsById(cid)
-            const productById = await contenedor.productById(pid)
-        
-           const newProductToCart = {
+            const cartsPrev = await this.getCartsById(cid);
+            const productById = await Contenedor.productById(pid);
+    
+            const newProductToCart = {
                 product: productById.id,
                 quantity: 1
-            }
-            const carts = cartsPrev.map(cart => {
+            };
+    
+            const updatedCarts = cartsPrev.map(cart => {
                 if (cart.id === cid) {
-                    const productInCart = cart.products.find(product => product.product === pid)
+                    const productInCart = cart.products.find(product => product.product === pid);
                     if (productInCart) {
-                        productInCart.quantity++
+                        productInCart.quantity++;
                     } else {
-                        cart.products.push(newProductToCart)
+                        cart.products.push(newProductToCart);
                     }
                 }
-                return cart
-            })
-            await fs.promises.writeFile(this.path, JSON.stringify(carts))
-            return newProductToCart
+                return cart;
+            });    
+            const contentCart = await this.getCarts();
+    
+                const data = contentCart.map(existCart => {
+                const actCart = updatedCarts.find(cart => cart.id === existCart.id);
+                return actCart || existCart;
+            });
+    
+            await fs.promises.writeFile(this.path, JSON.stringify(data));
+    
+            return newProductToCart;
         } catch (error) {
-            console.log(error)
-            return error
+            console.log(error);
+            return error;
         }
-     }
+    }
+    
 }
 
 const cartManager = new CartManager('carts.json')
